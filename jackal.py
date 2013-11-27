@@ -6,6 +6,7 @@ from google.appengine.ext import db, webapp
 from google.appengine.api import users
 from random import shuffle
 import models
+import json
 
 
 def main(cl):
@@ -73,16 +74,25 @@ def createField():
 def query(q):
     """Обработчик запросов клиентов.
     """
+    answer = {}
+    answer['query'] = q
+    answer['type'] = ''
+    answer['content'] = {}
     if q == 'gamesList':
+        answer['type'] = 'data'
+        content = {}
+        content['games'] = []
         games_query = models.PlayerGame.gql('WHERE player=:1', users.get_current_user())
-        games_list = []
         for game in games_query.run():
+            game_new = {}
+            game_new['id'] = models.Game.gql('WHERE __key__=:1', db.Key(game.game)).get().key().id().__str__()
+            game_new['players'] = []
             players_query = models.PlayerGame.gql('WHERE game=:1', game.game)
-            players = []
             for player in players_query.run():
-                players.append(player.player.nickname().__str__())
-            games_list.append(players)
-        return games_list
+                game_new['players'].append(player.player.nickname().__str__())
+            content['games'].append(game_new)
+        answer['content'] = content
+        return json.JSONEncoder().encode(answer)
     elif q == 'createGame':
         field, figures = createField()
         game = models.Game()

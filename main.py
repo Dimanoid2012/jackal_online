@@ -18,7 +18,7 @@ class Jackal(webapp.RequestHandler):
 
 
 application = webapp.WSGIApplication(
-    [('/jackal', Jackal)],
+    [('/', Jackal)],
     debug=True)
 
 

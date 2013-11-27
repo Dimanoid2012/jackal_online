@@ -2,6 +2,7 @@
 __author__ = 'dimanoid'
 from random import randint
 from google.appengine.ext import db
+import json
 
 
 class Player(db.Model):
@@ -60,5 +61,3 @@ class Card(object):
 
     def action(self, pirate):
         pass
-
-#class

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Jackal</title>
+    <link type="text/css" rel="stylesheet" href="/stylesheets/jackal.css" />
+    <script type="text/javascript" src="/scripts/interface.js"></script>
+    <script type="text/javascript">
+        window.onload = function() {
+            var table = document.getElementById("field");
+            query("gamesList", gamesList);
+        }
+    </script>
+</head>
+<body>
+    <div id="fieldDiv">
+        <table id="field" cols="{{ field_size }}" rows="{{ field_size }}" cellspacing="0" cellpadding="0"></table>
+    </div>
+    <div id="gamesListDiv">
+        <input type="button" value="Создать игру" onclick="query('createGame', function (){});query('gamesList', gamesList)" />
+        <table id="gamesList" cols="4" cellspacing="0" cellpadding="0">
+            <caption>Список игр</caption>
+            <thead>
+                <tr>
+                    <td>Игрок 1</td>
+                    <td>Игрок 2</td>
+                    <td>Игрок 3</td>
+                    <td>Игрок 4</td>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

@@ -1,0 +1,41 @@
+#fieldDiv {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    /*border: 1px solid red;*/
+}
+
+table#field {
+    margin: auto;
+}
+
+table#field td {
+    width: 32px;
+    height: 32px;
+    margin: 0;
+    padding: 0;
+    border-collapse: collapse;
+}
+
+table#gamesList {
+    margin: auto;
+    border: 2px solid black;
+}
+
+table#gamesList thead td {
+    font-weight: bold;
+    text-align: center;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+    border-bottom: 2px solid black;
+}
+
+table#gamesList tbody tr:hover td {
+    background-color: #ddd;
+    cursor: default;
+}
+
+table#gamesList tbody td {
+    border: 1px solid black;
+}

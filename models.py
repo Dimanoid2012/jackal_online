@@ -15,6 +15,7 @@ class PlayerGame(db.Model):
 
 
 class Game(db.Model):
+    type = db.IntegerProperty()
     field = db.TextProperty()
     figures = db.TextProperty()
 

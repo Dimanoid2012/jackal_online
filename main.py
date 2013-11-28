@@ -10,11 +10,18 @@ class Jackal(webapp.RequestHandler):
         if not users.get_current_user():
             self.redirect(users.create_login_url(self.request.uri))
             return
-
-        if not self.request.get('query'):
+        s = ''
+        try:
+            s = self.request.uri.index('?')
+        except ValueError:
             jackal.main(self)
-        else:
-            self.response.out.write(jackal.query(self.request.get('query')))
+            return
+
+        get_arr = self.request.uri[s+1:].split('&')
+        get = {}
+        for b in get_arr:
+            get[b[:b.index('=')]] = b[b.index('=')+1:]
+        self.response.out.write(jackal.query(get))
 
 
 application = webapp.WSGIApplication(

@@ -6,7 +6,7 @@ from google.appengine.ext import db, webapp
 from google.appengine.api import users
 from random import shuffle
 import models
-import json
+from json import JSONEncoder
 
 
 def main(cl):
@@ -75,41 +75,59 @@ def query(q):
     """Обработчик запросов клиентов.
     """
     answer = {}
-    answer['query'] = q
+    answer['query'] = q['query']
     answer['type'] = ''
     answer['content'] = {}
-    if q == 'gamesList':
+    if q['query'] == 'gamesList':
         answer['type'] = 'data'
         content = {}
         content['games'] = []
-        games_query = models.PlayerGame.gql('WHERE player=:1', users.get_current_user())
-        for game in games_query.run():
+        game_query = models.Game.all()
+        for game in game_query:
             game_new = {}
-            game_new['id'] = models.Game.gql('WHERE __key__=:1', db.Key(game.game)).get().key().id().__str__()
+            game_new['id'] = game.key().id().__str__()
+            game_new['type'] = game.type
             game_new['players'] = []
-            players_query = models.PlayerGame.gql('WHERE game=:1', game.game)
-            for player in players_query.run():
-                game_new['players'].append(player.player.nickname().__str__())
+            player_game_query = models.PlayerGame.gql('WHERE game=:1', game.key().__str__())
+            for player_game in player_game_query:
+                game_new['players'].append(player_game.player.nickname().__str__())
             content['games'].append(game_new)
         answer['content'] = content
-        return json.JSONEncoder().encode(answer)
-    elif q == 'createGame':
+        return JSONEncoder().encode(answer)
+    elif q['query'] == 'createGame':
         field, figures = createField()
         game = models.Game()
-        game.field, game.figures = field.__str__(), figures.__str__()
+        game.type = 0
+        game.field = field.__str__()
+        game.figures = figures.__str__()
         game.put()
         player_game = models.PlayerGame()
         player_game.player = users.get_current_user()
         player_game.game = game.key().__str__()
         player_game.put()
-        return [query('field'), query('figures')]
-    elif q == 'field':
-        player_game = models.PlayerGame().gql('WHERE player=:1', users.get_current_user()).get()
-        game = models.Game().gql('WHERE __key__=:1', db.Key(player_game.game)).get()
-        return game.field
-    elif q == 'figures':
-        player_game = models.PlayerGame().gql('WHERE player=:1', users.get_current_user()).get()
-        game = models.Game().gql('WHERE __key__=:1', db.Key(player_game.game)).get()
-        return game.figures
+        #return [query('field'), query('figures')]
+    elif q['query'] == 'game' and q['gameId']:
+        game = models.Game().get_by_id(int(q['gameId']))
+        player_game_query = models.PlayerGame().gql('WHERE game=:1', game.key().__str__())
+        players = []
+        for player_game in player_game_query:
+            player = models.Player().gql('WHERE account=:1', player_game.player).get()
+            players.append(player.account.nickname())
+        if not users.get_current_user().nickname() in players:
+            player_game_new = models.PlayerGame()
+            player_game_new.player = users.get_current_user()
+            player_game_new.game = game.key().__str__()
+            player_game_new.put()
+            players.append(users.get_current_user().nickname())
+        answer['type'] = 'data'
+        answer['content']['type'] = game.type
+        answer['content']['players'] = players
+        answer['content']['field'] = game.field
+        answer['content']['figures'] = game.figures
+        return JSONEncoder().encode(answer)
+    #elif q['query'] == 'figures':
+    #    player_game = models.PlayerGame().gql('WHERE player=:1', users.get_current_user()).get()
+    #    game = models.Game().gql('WHERE __key__=:1', db.Key(player_game.game)).get()
+    #    return game.figures
     else:
         return None

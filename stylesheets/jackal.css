@@ -5,6 +5,9 @@
     width: 100%;
     /*border: 1px solid red;*/
 }
+#createGameDiv {
+    display: none;
+}
 
 table#field {
     margin: auto;
